@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+        <UseDefaultCompilerOptions Value="True"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <Title Value="Raytracer"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0"/>
+    </RunParams>
+    <Units Count="10">
+      <Unit0>
+        <Filename Value="Raytracer.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="src\uraytracer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uRaytracer"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="src\ufpcsceneloader.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uFPCSceneLoader"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="src\uimageppmexporter.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="src\uscene.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uScene"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="src\usceneelements.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uSceneElements"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="src\uvectortypes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uVectorTypes"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="src\uviewer.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="src\usceneelementlists.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uSceneElementLists"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="src\ubaselist.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uBaseList"/>
+      </Unit9>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="Raytracer"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="src"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

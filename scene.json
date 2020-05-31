@@ -1,0 +1,55 @@
+{
+	"materials": [
+		{
+			"id": "ivory",
+			"diffuse": [0.4, 0.4, 0.3],
+			"albedo": [0.6, 0.3, 0.1, 0.0],			
+			"specularExp": 50,
+			"refractiveIndex": 1
+		},
+		{
+			"id": "red_rubber",
+			"diffuse": [0.3, 0.1, 0.1],
+			"albedo": [0.9, 0.1, 0.0, 0.0],			
+			"specularExp": 10,
+			"refractiveIndex": 1
+		},		
+		{
+			"id": "mirror",
+			"diffuse": [1, 1, 1],
+			"albedo": [0.0, 10.0, 0.8, 0.0],			
+			"specularExp": 1425,
+			"refractiveIndex": 1
+		},		
+		{
+			"id": "glass",
+			"diffuse": [0.6, 0.7, 0.8],
+			"albedo": [0.0, 0.5, 0.1, 0.8],			
+			"specularExp": 125,
+			"refractiveIndex": 1.5
+		}
+	],
+	"objects":[
+		{
+			"object": "sphere",
+			"position": [0, 0, -1],
+			"radius": 0.5,
+			"materialId": "ivory"
+		},
+		{
+			"object": "sphere",
+			"position": [0, -100.5, -1],
+			"radius": 100,
+			"materialId": "glass"
+		}	
+			
+	],
+	"camera": {
+			"position": [0, 0, 0],
+			"direction": [0, 0, -1],
+			"fov": 1.57,
+			"width": 640,
+			"height": 480,
+			"backgroundColor": [0.2, 0.7, 0.8]
+	}	
+}
