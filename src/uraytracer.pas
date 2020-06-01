@@ -10,7 +10,8 @@ uses
   uSceneElementLists,
   uBaseList,
   System.SysUtils,
-  uRandomUtils;
+  uRandomUtils,
+  uRaytracerTypes;
 
 type
   TRaytracer = class
@@ -52,8 +53,11 @@ class function TRaytracer.CastRay(_ARay: TRay; _AScene: TScene; _ADepth: integer
 var
   AHit: THit;
 //  n: TVector3f;
-  target: TVector3f;
-  ANewRay: TRay;
+//  target: TVector3f;
+//  ANewRay: TRay;
+
+  scattered: TRay;
+  attenuation: TVector3f;
 begin
   // If we've exceeded the ray bounce limit, no more light is gathered.
   if (_ADepth <= 0) then
@@ -67,13 +71,19 @@ begin
 //    n := AHit.Normal;  //
 //    result.Create(N.x+1, N.y+1, N.z+1);
 //    result := result.Scale(0.5);
-    target := AHit.Point.Add(AHit.Normal).Add(TRandomUtils.RandomInUnitSphere);
 
-    ANewRay.Create(AHit.Point, target.Subtract(AHit.Point));
-    result := CastRay(ANewRay, _AScene, _ADepth - 1);
-    result := result.Scale(0.5);
-
-    exit;
+    if AHit.Material.Scatter(_ARay, AHit, attenuation, scattered) then
+    begin
+      result := CastRay(scattered, _AScene, _ADepth - 1);
+      result := result.Scale(attenuation);
+      //result := result.Scale(0.5);
+      exit;
+    end
+    else
+    begin
+      result.Create(0,0,0);
+      exit;
+    end;
   end;
 
   Result := ray_color(_ARay); // background color
@@ -93,8 +103,8 @@ var
   samples_per_pixel: Integer;
   max_depth: Integer;
 begin
-  samples_per_pixel := 100;
-  max_depth := 4;
+  samples_per_pixel := 1000;
+  max_depth := 50;
 
   for j := _AViewer.Height -1 downto 0 do
     for i := 0 to _AViewer.Width - 1 do
@@ -105,9 +115,6 @@ begin
       begin
         x := (i + TRandomUtils.RandomSingle()) / (_AViewer.Width - 1);
         y := (j + TRandomUtils.RandomSingle()) / (_AViewer.Height - 1);
-
-//        x := (i + (1 / (s + 1))) / (_AViewer.Width - 1);
-//        y := (j + (1 / (s + 1))) / (_AViewer.Height - 1);
 
         ARay := _AScene.Camera.GetRay(x , y);
 
@@ -121,6 +128,7 @@ begin
       AColor.z := sqrt(scale * AColor.z);
 
       _AViewer.SetPixel(i, j, AColor);
+      writeln('Progress: '+ formatfloat('0.00', ((_AViewer.Height-j)*_AViewer.Width + i) * 100 / (_AViewer.Height*_AViewer.Width)) + ' %.')
     end;
 end;
 

@@ -13,6 +13,8 @@ type
     class function RandomVector(): TVector3f; overload;
     class function RandomVector(_AMin, _AMax: Single): TVector3f; overload;
     class function RandomInUnitSphere(): TVector3f;
+    class function RandomUnitVector(): TVector3f;
+    class function RandomInHemisphere(_ANormal: TVector3f): TVector3f;
   end;
 
 implementation
@@ -22,6 +24,17 @@ implementation
 class function TRandomUtils.RandomSingle(): Single;
 begin
  Result := Random();
+end;
+
+class function TRandomUtils.RandomInHemisphere(_ANormal: TVector3f): TVector3f;
+var
+  in_unit_sphere: TVector3f;
+begin
+  in_unit_sphere := RandomInUnitSphere();
+  if (in_unit_sphere.DotProduct(_ANormal) > 0) then// In the same hemisphere as the normal
+    result := in_unit_sphere
+  else
+    result := in_unit_sphere.Scale(-1);
 end;
 
 class function TRandomUtils.RandomInUnitSphere: TVector3f;
@@ -41,6 +54,18 @@ end;
 class function TRandomUtils.RandomSingle(_AMin, _AMax: Single): Single;
 begin
  Result := _AMin + (_AMax -_AMin) * RandomSingle();
+end;
+
+class function TRandomUtils.RandomUnitVector: TVector3f;
+var
+  a,
+  z,
+  r: single;
+begin
+  a := RandomSingle(0, 2 * PI);
+  z := RandomSingle(-1, 1);
+  r := sqrt(1 - z*z);
+    Result.Create(r * cos(a), r * sin(a), z);
 end;
 
 class function TRandomUtils.RandomVector(_AMin, _AMax: Single): TVector3f;

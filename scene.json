@@ -1,32 +1,26 @@
 {
 	"materials": [
 		{
-			"id": "ivory",
-			"diffuse": [0.4, 0.4, 0.3],
-			"albedo": [0.6, 0.3, 0.1, 0.0],			
-			"specularExp": 50,
-			"refractiveIndex": 1
+			"id": "dif_red",
+			"type": "diffuse",
+			"albedo": [0.7, 0.3, 0.3]			
 		},
 		{
-			"id": "red_rubber",
-			"diffuse": [0.3, 0.1, 0.1],
-			"albedo": [0.9, 0.1, 0.0, 0.0],			
-			"specularExp": 10,
-			"refractiveIndex": 1
-		},		
+			"id": "dif_yellow",
+			"type": "diffuse",
+			"albedo": [0.8, 0.8, 0.0]	
+		},
 		{
-			"id": "mirror",
-			"diffuse": [1, 1, 1],
-			"albedo": [0.0, 10.0, 0.8, 0.0],			
-			"specularExp": 1425,
-			"refractiveIndex": 1
-		},		
+			"id": "met_yellow",
+			"type": "metal",
+			"fuzz": 1,
+			"albedo": [0.8,0.6,0.2]	
+		},
 		{
-			"id": "glass",
-			"diffuse": [0.6, 0.7, 0.8],
-			"albedo": [0.0, 0.5, 0.1, 0.8],			
-			"specularExp": 125,
-			"refractiveIndex": 1.5
+			"id": "met_lightgrey",
+			"type": "metal",
+			"fuzz": 0.3,			
+			"albedo": [0.8,0.8,0.8]	
 		}
 	],
 	"objects":[
@@ -34,22 +28,33 @@
 			"object": "sphere",
 			"position": [0, 0, -1],
 			"radius": 0.5,
-			"materialId": "ivory"
+			"materialId": "dif_red"
 		},
 		{
 			"object": "sphere",
 			"position": [0, -100.5, -1],
 			"radius": 100,
-			"materialId": "glass"
-		}	
-			
+			"materialId": "dif_yellow"
+		},
+		{
+			"object": "sphere",
+			"position": [1,0,-1],
+			"radius": 0.5,
+			"materialId": "met_yellow"
+		},		
+		{
+			"object": "sphere",
+			"position": [-1,0,-1],
+			"radius": 0.5,
+			"materialId": "met_lightgrey"
+		}			
 	],
 	"camera": {
 			"position": [0, 0, 0],
 			"direction": [0, 0, -1],
 			"fov": 1.57,
-			"width": 640,
-			"height": 480,
+			"width": 682,
+			"height": 384,
 			"backgroundColor": [0.2, 0.7, 0.8]
 	}	
 }

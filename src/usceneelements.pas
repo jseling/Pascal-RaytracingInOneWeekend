@@ -3,7 +3,10 @@ unit uSceneElements;
 interface
 
 uses
-  uVectorTypes, System.SysUtils;
+  uVectorTypes,
+  System.SysUtils,
+  uRayTracerTypes,
+  uRandomUtils;
 
 type
 
@@ -13,26 +16,24 @@ type
     Intensity: Single;
   end;
 
+
   { TMaterial }
 
-  TMaterial = class
+  TLambertianMaterial = class(TBaseMaterial)
   public
-    Name: string;
-    DiffuseColor: TVector3f;
-    Albedo: TVector4f;
-    SpecularExponent: Single;
-    RefractiveIndex: Single;
-    constructor Create(const _AName: string);
-    function CalculateDiffuseColorInScene(const _ADiffuseLightIntensity: Single): TVector3f;
-    function CalculateSpecularColorInScene(const _ASpecularLightIntensity: Single): TVector3f;
-    function CalculateReflectColorInScene(const _AReflectColor: TVector3f): TVector3f;
-    function CalculateRefractColorInScene(const _ARefractColor: TVector3f): TVector3f;
+    function Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f; out _ARayScattered: TRay): Boolean; override;
+  end;
+
+  TMetalMaterial = class(TBaseMaterial)
+  public
+    Fuzz: Single;
+    function Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f; out _ARayScattered: TRay): Boolean; override;
   end;
 
   TMeshObject = class
   public
     Center: TVector3f;
-    Material: TMaterial;
+    Material: TBaseMaterial;
 
     function RayIntersect(_ARay: TRay; _At_min, _At_max: Single; out _AHit: THit): Boolean; virtual; abstract;
   end;
@@ -103,6 +104,7 @@ begin
 
     normal := _AHit.Point.Subtract(Center).Scale(InvRadius());
     _AHit.SetFaceNormal(_ARay, normal);
+    _AHit.Material := Material;
 
     result := true;
     exit;
@@ -116,6 +118,7 @@ begin
 
     normal := _AHit.Point.Subtract(Center).Scale(InvRadius());
     _AHit.SetFaceNormal(_ARay, normal);
+    _AHit.Material := Material;
 
     result := true;
     exit;
@@ -133,41 +136,6 @@ begin
   FInvRadius := 1 / FRadius;
 end;
 
-{ TMaterial }
-
-function TMaterial.CalculateDiffuseColorInScene(const _ADiffuseLightIntensity: Single): TVector3f;
-begin
-  Result := Self.DiffuseColor.Scale(_ADiffuseLightIntensity * Self.Albedo.X)
-end;
-
-function TMaterial.CalculateReflectColorInScene(const _AReflectColor: TVector3f): TVector3f;
-begin
-  Result := _AReflectColor.Scale(Self.Albedo.Z);
-end;
-
-function TMaterial.CalculateRefractColorInScene(const _ARefractColor: TVector3f): TVector3f;
-begin
-  Result := _ARefractColor.Scale(Self.Albedo.W);
-end;
-
-function TMaterial.CalculateSpecularColorInScene(const _ASpecularLightIntensity: Single): TVector3f;
-var
-  ASpecularFactor: Single;
-begin
-  ASpecularFactor := _ASpecularLightIntensity * Self.Albedo.Y;
-  Result.Create(ASpecularFactor, ASpecularFactor, ASpecularFactor);
-end;
-
-constructor TMaterial.Create(const _AName: string);
-begin
-  DiffuseColor.Create(0.0, 0.0, 0.0);
-  Albedo.Create(1, 0, 0, 0);
-  SpecularExponent := 50;
-  RefractiveIndex := 1;
-
-  Name := _AName;
-end;
-
 { TCamera }
 
 constructor TCamera.Create;
@@ -177,7 +145,7 @@ var
   viewport_width: Single;
   f: TVector3f;
 begin
-  aspect_ratio := 4 / 3;
+  aspect_ratio := 16 / 9;
   viewport_height := 2;
   viewport_width := viewport_height * aspect_ratio;
 
@@ -200,6 +168,35 @@ begin
   //ADir := Adir.Normalize();
 
   Result.Create(AOrig, ADir);
+end;
+
+{ TLambertianMaterial }
+
+function TLambertianMaterial.Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f;
+  out _ARayScattered: TRay): Boolean;
+var
+  scatter_direction: TVector3f;
+begin
+  scatter_direction := _AHit.Normal.Add(TRandomUtils.RandomUnitVector());
+  _ARayScattered.Create(_AHit.Point, scatter_direction);
+  _AColorAttenuation := Albedo;
+
+  Result := True;
+end;
+
+{ TMetalMaterial }
+
+function TMetalMaterial.Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f;
+  out _ARayScattered: TRay): Boolean;
+var
+  reflect: TVector3f;
+begin
+  reflect := _ARayIn.Dir.Reflect(_AHit.Normal);
+  reflect := reflect.Add(TRandomUtils.RandomInUnitSphere().Scale(Fuzz));
+  _ARayScattered.Create(_AHit.Point, reflect);
+  _AColorAttenuation := Albedo;
+
+  Result := _ARayScattered.Dir.DotProduct(_AHit.Normal) > 0;
 end;
 
 end.

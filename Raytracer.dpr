@@ -15,7 +15,8 @@ uses
   ubaselist in 'src\ubaselist.pas',
   usceneelementlists in 'src\usceneelementlists.pas',
   uimagebmpexporter in 'src\uimagebmpexporter.pas',
-  uRandomUtils in 'src\uRandomUtils.pas';
+  uRandomUtils in 'src\uRandomUtils.pas',
+  uRaytracerTypes in 'src\uRaytracerTypes.pas';
 
 var
   AViewer: TViewer;
@@ -36,29 +37,35 @@ begin
   //TODO:
   //1 - Memory leaks
 
-  AScene := TSceneLoader.Build('scene.json');
   try
-    AViewer := TViewer.Create(AScene.Camera);
+    AScene := TSceneLoader.Build('scene.json');
     try
-      ////////////////////////////////////////////////////////////////////////////
+      AViewer := TViewer.Create(AScene.Camera);
+      try
+        ////////////////////////////////////////////////////////////////////////////
 
-        AStart := now;
-        TRaytracer.Render(AViewer, AScene);
-        AEnd := now;
+          AStart := now;
+          TRaytracer.Render(AViewer, AScene);
+          AEnd := now;
 
-      ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
 
-      //TImagePPMExporter.ExportToFile(AViewer, 'render.ppm');
-      TImageBMPExporter.ExportToFile(AViewer, 'render.bmp');
-      //AViewer.SaveToBitmap('render.bmp');
+        //TImagePPMExporter.ExportToFile(AViewer, 'render.ppm');
+        TImageBMPExporter.ExportToFile(AViewer, 'render.bmp');
+        //AViewer.SaveToBitmap('render.bmp');
+      finally
+        AViewer.Free;
+      end;
     finally
-      AViewer.Free;
+      AScene.Free;
     end;
-  finally
-    AScene.Free;
+    writeln('Done ' + MillisecondsBetween(AStart, AEnd).ToString + ' ms');
+  except
+    on E: Exception do
+     writeln('Error: ' + E.Message);
   end;
 
-  writeln('Done ' + MillisecondsBetween(AStart, AEnd).ToString + ' ms');
+
   readln;
 end.
 

@@ -6,8 +6,10 @@ backup
 *.res
 *.dproj.local
 *.lps
+*.bmp
 *.ppm
 *.identcache
 *.drc
 *.map
+*.stat
 *.pas.~*

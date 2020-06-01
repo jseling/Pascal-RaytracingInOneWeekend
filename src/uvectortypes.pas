@@ -27,7 +27,8 @@ type
 
     function Add(_AVector: TVector3f): TVector3f; inline;
     function Subtract(_AVector: TVector3f): TVector3f; inline;
-    function Scale(_AFactor: Single): TVector3f; inline;
+    function Scale(_AFactor: Single): TVector3f; overload; inline;
+    function Scale(_AFactor: TVector3f): TVector3f; overload; inline;
     function DotProduct(_AVector: TVector3f): Single; inline;
     function Magnitude(): Single; inline;
     function MagnitudeSquared(): Single; inline;
@@ -45,24 +46,6 @@ type
     Z: Single;
     W: Single;
     procedure Create(_AX, _AY, _AZ, _AW: Single);
-  end;
-
-  TRay = record
-  public
-    Orig: TVector3f;
-    Dir: TVector3f;
-    procedure Create(_AOrig, _ADir: TVector3f);
-    function At(_AFactor: Single): TVector3f;
-  end;
-
-  THit = record
-  public
-    Point: TVector3f;
-    Normal: TVector3f;
-    t: Single;
-    FrontFace: Boolean;
-    procedure Create(_APoint, _ANormal: TVector3f; _At: Single);
-    procedure SetFaceNormal(_ARay: TRay; _ANormal: TVector3f);
   end;
 
   PColor = ^TColor;
@@ -232,6 +215,13 @@ begin
                Z * _AFactor);
 end;
 
+function TVector3f.Scale(_AFactor: TVector3f): TVector3f;
+begin
+  Result.Create(X * _AFactor.X,
+               Y * _AFactor.Y,
+               Z * _AFactor.Z);
+end;
+
 function TVector3f.Subtract(_AVector: TVector3f): TVector3f;
 begin
   Result.Create(X - _AVector.X,
@@ -247,38 +237,6 @@ begin
   Y := _AY;
   Z := _AZ;
   W := _AW;
-end;
-
-{ TRay }
-
-function TRay.At(_AFactor: Single): TVector3f;
-begin
-  Result := Orig.Add(Dir.Scale(_AFactor));
-end;
-
-procedure TRay.Create(_AOrig, _ADir: TVector3f);
-begin
-  Orig := _AOrig;
-  Dir := _ADir;
-end;
-
-{ THit }
-
-procedure THit.Create(_APoint, _ANormal: TVector3f; _At: Single);
-begin
-  Point := _APoint;
-  Normal := _ANormal;
-  t := _At;
-end;
-
-procedure THit.SetFaceNormal(_ARay: TRay; _ANormal: TVector3f);
-begin
-  FrontFace := _ARay.Dir.DotProduct(_ANormal) < 0;
-
-  if FrontFace then
-    Normal := _ANormal
-  else
-    Normal := _ANormal.Scale(-1);
 end;
 
 end.

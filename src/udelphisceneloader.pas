@@ -10,14 +10,15 @@ uses
   System.IOUtils,
   uScene,
   System.Generics.Collections,
-  uVectorTypes;
+  uVectorTypes,
+  uRayTracerTypes;
 
 type
   TSceneLoader = class
   private
     class function GetJSONDataFromFile(const _AFileName: string): TJSONObject;
 
-    class function GetMaterialFromJSON(_AJSONObject: TJSONObject): TMaterial;
+    class function GetMaterialFromJSON(_AJSONObject: TJSONObject): TBaseMaterial;
     class function GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;
     class function GetLightFromJSON(_AJSONObject: TJSONObject): TLight;
     class function GetCameraFromJSON(_AJSONObject: TJSONObject): TCamera;
@@ -89,34 +90,34 @@ begin
 end;
 
 
-class function TSceneLoader.GetMaterialFromJSON(_AJSONObject: TJSONObject): TMaterial;
+class function TSceneLoader.GetMaterialFromJSON(_AJSONObject: TJSONObject): TBaseMaterial;
 var
-  s: string;
+  sName,
+  sType: string;
+
   AData: TJSONArray;
-  x,y,z,w: Single;
+  x,y,z: Single;
 begin
-  s := _AJSONObject.GetValue('id').Value;
-  result := TMaterial.Create(s);
+  sName := _AJSONObject.GetValue('id').Value;
+  sType := _AJSONObject.GetValue('type').Value;
 
-  AData := _AJSONObject.GetValue<TJSONArray>('diffuse');
-  x := AData.Items[0].GetValue<single>;
-  y := AData.Items[1].GetValue<single>;
-  z := AData.Items[2].GetValue<single>;
-  result.DiffuseColor.Create(x, y, z);
+  if sType = 'diffuse' then
+  begin
+    result := TLambertianMaterial.Create;
+  end
+  else if sType = 'metal' then
+  begin
+    result := TMetalMaterial.Create;
+    TMetalMaterial(result).Fuzz := _AJSONObject.GetValue<single>('fuzz');
+  end;
 
+  result.Name := sName;
 
   AData := _AJSONObject.GetValue<TJSONArray>('albedo');
   x := AData.Items[0].GetValue<single>;
   y := AData.Items[1].GetValue<single>;
   z := AData.Items[2].GetValue<single>;
-  w := AData.Items[3].GetValue<single>;
-  result.Albedo.Create(x, y, z, w);
-
-  x := _AJSONObject.GetValue<Single>('specularExp');
-  result.SpecularExponent := x;
-
-  x := _AJSONObject.GetValue<Single>('refractiveIndex');
-  result.RefractiveIndex := x;
+  result.Albedo.Create(x, y, z);
 end;
 
 class function TSceneLoader.GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;

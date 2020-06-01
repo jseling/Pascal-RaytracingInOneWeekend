@@ -8,7 +8,8 @@ uses
   Classes,
   SysUtils,
   uBaseList,
-  uSceneElements;
+  uSceneElements,
+  uRaytracerTypes;
 
 type
   TMeshObjectList = class(TBaseList)
@@ -23,8 +24,8 @@ type
 
   TMaterialList = class(TBaseList)
   public
-    function Get(Index: Integer): TMaterial; reintroduce; inline;
-    function GetByName(const _AName: string): TMaterial;
+    function Get(Index: Integer): TBaseMaterial; reintroduce; inline;
+    function GetByName(const _AName: string): TBaseMaterial;
   end;
 
 implementation
@@ -39,15 +40,15 @@ begin
   Result := TLight(inherited Get(Index));
 end;
 
-function TMaterialList.Get(Index: Integer): TMaterial;
+function TMaterialList.Get(Index: Integer): TBaseMaterial;
 begin
-  Result := TMaterial(inherited Get(Index));
+  Result := TBaseMaterial(inherited Get(Index));
 end;
 
-function TMaterialList.GetByName(const _AName: string): TMaterial;
+function TMaterialList.GetByName(const _AName: string): TBaseMaterial;
 var
   i: integer;
-  AMaterial: TMaterial;
+  AMaterial: TBaseMaterial;
 begin
   for i := 0 to Self.Count -1 do
   begin
