@@ -8,7 +8,6 @@
         <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
         <MainUnitHasScaledStatement Value="False"/>
-        <UseDefaultCompilerOptions Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
@@ -27,7 +26,15 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <Units Count="10">
+    <RequiredPackages Count="2">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCLBase"/>
+      </Item2>
+    </RequiredPackages>
+    <Units Count="12">
       <Unit0>
         <Filename Value="Raytracer.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -75,6 +82,14 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uBaseList"/>
       </Unit9>
+      <Unit10>
+        <Filename Value="src\uRaytracerTypes.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="src\uimagebmpexporter.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit11>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

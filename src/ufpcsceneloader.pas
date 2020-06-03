@@ -9,14 +9,15 @@ uses
   jsonparser,
   jsonscanner,
   uscene,
-  uSceneElements;
+  uSceneElements,
+  uRayTracerTypes;
 
 type
   TSceneLoader = class
   private
     class function GetJSONDataFromFile(const _AFileName: string): TJSONObject;
 
-    class function GetMaterialFromJSON(_AJSONObject: TJSONObject): TMaterial;
+    class function GetMaterialFromJSON(_AJSONObject: TJSONObject): TBaseMaterial;
     class function GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;
     class function GetLightFromJSON(_AJSONObject: TJSONObject): TLight;
     class function GetCameraFromJSON(_AJSONObject: TJSONObject): TCamera;
@@ -100,7 +101,7 @@ begin
   end;
 end;
 
-class function TSceneLoader.GetMaterialFromJSON(_AJSONObject: TJSONObject): TMaterial;
+class function TSceneLoader.GetMaterialFromJSON(_AJSONObject: TJSONObject): TBaseMaterial;
 var
   sName,
   sType: string;
@@ -123,11 +124,11 @@ begin
 
   result.Name := sName;  
 
-  AData := _AJSONObject.Find('diffuse');
+  AData := _AJSONObject.Find('albedo');
   x := AData.Items[0].AsFloat;
   y := AData.Items[1].AsFloat;
   z := AData.Items[2].AsFloat;
-  result.DiffuseColor.Create(x, y, z);
+  result.Albedo.Create(x, y, z);
 end;
 
 class function TSceneLoader.GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;

@@ -6,8 +6,6 @@ backup
 *.res
 *.dproj.local
 *.lps
-*.bmp
-*.ppm
 *.identcache
 *.drc
 *.map

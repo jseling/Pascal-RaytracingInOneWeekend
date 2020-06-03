@@ -4,7 +4,7 @@ interface
 
 uses
   uVectorTypes,
-  System.SysUtils,
+  SysUtils,
   uRayTracerTypes,
   uRandomUtils;
 

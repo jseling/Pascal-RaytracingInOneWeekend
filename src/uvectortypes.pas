@@ -9,7 +9,7 @@ unit uVectorTypes;
 interface
 
 uses
-  System.SysUtils;
+  SysUtils;
 
 type
 

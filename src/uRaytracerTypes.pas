@@ -1,5 +1,9 @@
 unit uRaytracerTypes;
 
+{$IFDEF FPC}
+  {$modeswitch advancedrecords}
+{$ENDIF}
+
 interface
 
 uses

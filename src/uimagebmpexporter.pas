@@ -1,18 +1,25 @@
 unit uimagebmpexporter;
+
 interface
 
 uses
   sysutils,
-  uViewer,
-  uVectorTypes,
   Classes,
-  Vcl.Graphics,
-  Winapi.Windows;
+  Graphics,
+
+  {$IFDEF WINDOWS}
+   Winapi.Windows,
+  {$ELSE UNIX}
+   LCLIntf,
+  {$ENDIF}
+
+  uViewer,
+  uVectorTypes;
 
 type
   TImageBMPExporter = class
   private
-    class function CreateBitmap(AViewer: TViewer): Vcl.Graphics.TBitmap;
+    class function CreateBitmap(AViewer: TViewer): Graphics.TBitmap;
   public
     class procedure ExportToFile(AViewer: TViewer; const _AFileName: string);
   end;
@@ -21,8 +28,12 @@ implementation
 
 { TImageBMPExporter }
 
-class function TImageBMPExporter.CreateBitmap(AViewer: TViewer): Vcl.Graphics.TBitmap;
+class function TImageBMPExporter.CreateBitmap(AViewer: TViewer): Graphics.TBitmap;
 type
+  TRGBTriple = packed record
+    R, G, B: byte;
+  end;
+
   TRGBTripleArray = ARRAY [Word] of TRGBTriple;
   pRGBTripleArray = ^TRGBTripleArray; // use a PByteArray for pf8bit color
 var
@@ -30,7 +41,7 @@ var
   AScanLine: pRGBTripleArray;
   AColor: TByteColor;
 begin
-  Result := Vcl.Graphics.TBitmap.Create;
+  Result := Graphics.TBitmap.Create;
   try
     Result.Height := AViewer.Height;
     Result.Width := AViewer.Width;
@@ -47,9 +58,16 @@ begin
 //        else
         AColor.SetFromVector3f(AViewer.GetPixel(x, y));
 
+        {$IFDEF WINDOWS}
         AScanLine[x].rgbtRed := AColor.R;
         AScanLine[x].rgbtGreen := AColor.G;
         AScanLine[x].rgbtBlue := AColor.B;
+        {$ELSE IF UNIX}
+        AScanLine^[x].R := AColor.R;
+        AScanLine^[x].G := AColor.G;
+        AScanLine^[x].B := AColor.B;
+        {$ENDIF}
+
       end;
     end;
   except
@@ -60,7 +78,7 @@ end;
 
 class procedure TImageBMPExporter.ExportToFile(AViewer: TViewer; const _AFileName: string);
 var
-  ABitmap: Vcl.Graphics.TBitmap;
+  ABitmap: Graphics.TBitmap;
 begin
   ABitmap := TImageBMPExporter.CreateBitmap(AViewer);
   try
