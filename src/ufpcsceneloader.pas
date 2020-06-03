@@ -102,32 +102,32 @@ end;
 
 class function TSceneLoader.GetMaterialFromJSON(_AJSONObject: TJSONObject): TMaterial;
 var
-  s: string;
+  sName,
+  sType: string;
+
   AData: TJSONData;
-  x,y,z,w: Single;
+  x,y,z: Single;
 begin
-  s := _AJSONObject.Find('id').AsString;
-  result := TMaterial.Create(s);
+  sName := _AJSONObject.Find('id').AsString;
+  sType := _AJSONObject.Find('type').AsString;
+
+  if sType = 'diffuse' then
+  begin
+    result := TLambertianMaterial.Create;
+  end
+  else if sType = 'metal' then
+  begin
+    result := TMetalMaterial.Create;
+    TMetalMaterial(result).Fuzz := _AJSONObject.Find('fuzz').AsFloat;
+  end;
+
+  result.Name := sName;  
 
   AData := _AJSONObject.Find('diffuse');
   x := AData.Items[0].AsFloat;
   y := AData.Items[1].AsFloat;
   z := AData.Items[2].AsFloat;
   result.DiffuseColor.Create(x, y, z);
-
-
-  AData := _AJSONObject.Find('albedo');
-  x := AData.Items[0].AsFloat;
-  y := AData.Items[1].AsFloat;
-  z := AData.Items[2].AsFloat;
-  w := AData.Items[3].AsFloat;
-  result.Albedo.Create(x, y, z, w);
-
-  x := _AJSONObject.Find('specularExp').AsFloat;
-  result.SpecularExponent := x;
-
-  x := _AJSONObject.Find('refractiveIndex').AsFloat;
-  result.RefractiveIndex := x;
 end;
 
 class function TSceneLoader.GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;
@@ -177,11 +177,11 @@ begin
   z := AData.Items[2].AsFloat;
   result.Position.Create(x, y, z);
 
-  AData := _AJSONObject.Find('direction');
-  x := AData.Items[0].AsFloat;
-  y := AData.Items[1].AsFloat;
-  z := AData.Items[2].AsFloat;
-  result.Direction.Create(x, y, z);
+  // AData := _AJSONObject.Find('direction');
+  // x := AData.Items[0].AsFloat;
+  // y := AData.Items[1].AsFloat;
+  // z := AData.Items[2].AsFloat;
+  // result.Direction.Create(x, y, z);
 
   x := _AJSONObject.Find('fov').AsFloat;
   result.FOV := x;
@@ -192,11 +192,11 @@ begin
   x := _AJSONObject.Find('height').AsFloat;
   result.Height := trunc(x);
 
-  AData := _AJSONObject.Find('backgroundColor');
-  x := AData.Items[0].AsFloat;
-  y := AData.Items[1].AsFloat;
-  z := AData.Items[2].AsFloat;
-  result.BackgroundColor.Create(x, y, z);
+  // AData := _AJSONObject.Find('backgroundColor');
+  // x := AData.Items[0].AsFloat;
+  // y := AData.Items[1].AsFloat;
+  // z := AData.Items[2].AsFloat;
+  // result.BackgroundColor.Create(x, y, z);
 end;
 
 end.

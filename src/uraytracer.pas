@@ -16,6 +16,7 @@ uses
 type
   TRaytracer = class
   private
+    //class procedure ShowProgress(Position,Max:integer);
     class function CastRay(_ARay: TRay; _AScene: TScene; _ADepth: integer): TVector3f;
     class function SceneIntersect(_AScene: TScene; _ARay: TRay; _At_min, _At_max: single; out _AHit: THit): boolean;
     class function ray_color(r: TRay) : TVector3f;
@@ -29,6 +30,23 @@ uses
   Math;
 
 { TRaytracer }
+{
+class procedure TRaytracer.ShowProgress(Position,Max:integer);
+var
+  i,j:integer;
+  s:string;
+const
+  BarWidth=28; //must be less than 79
+begin
+  s := '[';
+
+  j := Position * BarWidth div Max;
+  for i := 1 to BarWidth do
+    if i <= j then s := s + '#' else s := s + '-';
+
+  s := s + ']';
+  Write(#13 + s);
+end;  }
 
 class function TRaytracer.ray_color(r: TRay) : TVector3f;
 var
@@ -76,7 +94,6 @@ begin
     begin
       result := CastRay(scattered, _AScene, _ADepth - 1);
       result := result.Scale(attenuation);
-      //result := result.Scale(0.5);
       exit;
     end
     else
@@ -103,7 +120,7 @@ var
   samples_per_pixel: Integer;
   max_depth: Integer;
 begin
-  samples_per_pixel := 1000;
+  samples_per_pixel := 100;
   max_depth := 50;
 
   for j := _AViewer.Height -1 downto 0 do
@@ -128,8 +145,13 @@ begin
       AColor.z := sqrt(scale * AColor.z);
 
       _AViewer.SetPixel(i, j, AColor);
-      writeln('Progress: '+ formatfloat('0.00', ((_AViewer.Height-j)*_AViewer.Width + i) * 100 / (_AViewer.Height*_AViewer.Width)) + ' %.')
+
+      write(#13'Progress: '+ formatfloat('0.00', ((_AViewer.Height-j)*_AViewer.Width + i) * 100 / (_AViewer.Height*_AViewer.Width)) + ' %.')
+
+      //ShowProgress(i, _AViewer.Height*_AViewer.Width);
     end;
+
+  writeln;
 end;
 
 class function TRaytracer.SceneIntersect(_AScene: TScene; _ARay: TRay; _At_min, _At_max: single; out _AHit: THit): boolean;

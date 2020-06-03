@@ -53,8 +53,8 @@
 			"position": [0, 0, 0],
 			"direction": [0, 0, -1],
 			"fov": 1.57,
-			"width": 682,
-			"height": 384,
+			"width": 400,
+			"height": 300,
 			"backgroundColor": [0.2, 0.7, 0.8]
 	}	
 }

@@ -145,7 +145,7 @@ var
   viewport_width: Single;
   f: TVector3f;
 begin
-  aspect_ratio := 16 / 9;
+  aspect_ratio := 4 / 3;
   viewport_height := 2;
   viewport_width := viewport_height * aspect_ratio;
 
