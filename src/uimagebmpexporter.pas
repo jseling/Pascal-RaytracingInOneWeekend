@@ -5,11 +5,12 @@ interface
 uses
   sysutils,
   Classes,
-  Graphics,
 
-  {$IFDEF WINDOWS}
-   Winapi.Windows,
-  {$ELSE UNIX}
+
+  {$IFDEF MSWINDOWS}
+   Vcl.Graphics,
+  {$ELSE LINUX}
+   Graphics,
    LCLIntf,
   {$ENDIF}
 
@@ -19,7 +20,7 @@ uses
 type
   TImageBMPExporter = class
   private
-    class function CreateBitmap(AViewer: TViewer): Graphics.TBitmap;
+    class function CreateBitmap(AViewer: TViewer): TBitmap;
   public
     class procedure ExportToFile(AViewer: TViewer; const _AFileName: string);
   end;
@@ -28,7 +29,7 @@ implementation
 
 { TImageBMPExporter }
 
-class function TImageBMPExporter.CreateBitmap(AViewer: TViewer): Graphics.TBitmap;
+class function TImageBMPExporter.CreateBitmap(AViewer: TViewer): TBitmap;
 type
   TRGBTriple = packed record
     R, G, B: byte;
@@ -41,7 +42,7 @@ var
   AScanLine: pRGBTripleArray;
   AColor: TByteColor;
 begin
-  Result := Graphics.TBitmap.Create;
+  Result := TBitmap.Create;
   try
     Result.Height := AViewer.Height;
     Result.Width := AViewer.Width;
@@ -78,7 +79,7 @@ end;
 
 class procedure TImageBMPExporter.ExportToFile(AViewer: TViewer; const _AFileName: string);
 var
-  ABitmap: Graphics.TBitmap;
+  ABitmap: TBitmap;
 begin
   ABitmap := TImageBMPExporter.CreateBitmap(AViewer);
   try
