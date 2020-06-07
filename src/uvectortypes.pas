@@ -9,7 +9,8 @@ unit uVectorTypes;
 interface
 
 uses
-  SysUtils;
+  SysUtils,
+  Math;
 
 type
 
@@ -75,9 +76,6 @@ type
   TArraySingle = array of Single;
 
 implementation
-
-uses
-  Math;
 
 { TColor }
 

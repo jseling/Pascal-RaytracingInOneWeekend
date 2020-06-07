@@ -6,7 +6,6 @@ uses
   sysutils,
   Classes,
 
-
   {$IFDEF MSWINDOWS}
    Vcl.Graphics,
   {$ELSE LINUX}
@@ -32,7 +31,11 @@ implementation
 class function TImageBMPExporter.CreateBitmap(AViewer: TViewer): TBitmap;
 type
   TRGBTriple = packed record
+    {$IFDEF MSWINDOWS}
+    B, G, R: byte;
+    {$ELSE IF LINUX}
     R, G, B: byte;
+    {$ENDIF}
   end;
 
   TRGBTripleArray = ARRAY [Word] of TRGBTriple;
@@ -54,21 +57,11 @@ begin
 
       for x := 0 to AViewer.Width - 1 do
       begin
-//        if _AFlipVertical then
-//          AColor.SetFromVector3f(AViewer.GetPixel(x, AViewer.Height - y));
-//        else
         AColor.SetFromVector3f(AViewer.GetPixel(x, y));
 
-        {$IFDEF WINDOWS}
-        AScanLine[x].rgbtRed := AColor.R;
-        AScanLine[x].rgbtGreen := AColor.G;
-        AScanLine[x].rgbtBlue := AColor.B;
-        {$ELSE IF UNIX}
-        AScanLine^[x].R := AColor.R;
-        AScanLine^[x].G := AColor.G;
-        AScanLine^[x].B := AColor.B;
-        {$ENDIF}
-
+        AScanLine[x].R := AColor.R;
+        AScanLine[x].G := AColor.G;
+        AScanLine[x].B := AColor.B;
       end;
     end;
   except

@@ -109,7 +109,9 @@ begin
   begin
     result := TMetalMaterial.Create;
     TMetalMaterial(result).Fuzz := _AJSONObject.GetValue<single>('fuzz');
-  end;
+  end
+  else
+    raise Exception.Create('Material type not supported: ''' + sType + '''');
 
   result.Name := sName;
 
