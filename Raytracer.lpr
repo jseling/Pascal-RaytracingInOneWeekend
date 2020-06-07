@@ -34,8 +34,8 @@ begin
       ////////////////////////////////////////////////////////////////////////////
 
       sTime := MillisecondsBetween(AStart, AEnd).ToString;
-      TImagePPMExporter.ExportToFile(AViewer, 'renderLinux'+sTime+'.ppm');
-      //TImageBMPExporter.ExportToFile(AViewer, 'render.bmp');
+      TImagePPMExporter.ExportToFile(AViewer, 'render.ppm');
+      TImageBMPExporter.ExportToFile(AViewer, 'render.bmp');
     finally
       AViewer.Free;
     end;

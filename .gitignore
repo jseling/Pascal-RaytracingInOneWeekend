@@ -2,6 +2,8 @@ lib
 dcu
 backup
 *.exe
+*.bmp
+*.ppm
 *.dcu
 *.res
 *.dproj.local
