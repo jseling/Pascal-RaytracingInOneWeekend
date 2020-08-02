@@ -10,30 +10,31 @@ uses
     {$IFDEF DCC}
      Vcl.Graphics,
     {$ELSE IF FPC}
-     Graphics,
-     IntfGraphics,
-     //LCLProc, 
-     //LResources,
-     GraphType,
+    fpimage,
+    fpwritebmp;  
     {$ENDIF}
   {$ELSE IF LINUX}
-   Graphics,
-   LCLIntf,
+    fpimage,
+    fpwritebmp,  
   {$ENDIF}
 
   uViewer,
   uVectorTypes;
 
 type
+  IImageExportable = interface
+    procedure SaveToFile();
+  end;  
+
   TImageBMPExporter = class
   private
     {$IFDEF MSWINDOWS}
     {$IFDEF DCC}
-    class function CreateBitmapDelphiWindows(AViewer: TViewer): TBitmap;
+    class procedure CreateBitmapDelphiWindows(AViewer: TViewer; const _AFileName: string);
     {$ENDIF}     
     {$ENDIF} 
     {$IFDEF FPC}   
-    class function CreateBitmapFPC(AViewer: TViewer): TBitmap; 
+    class procedure CreateBitmapFPC(AViewer: TViewer; const _AFileName: string); 
     {$ENDIF}        
   public
     class procedure ExportToFile(AViewer: TViewer; const _AFileName: string);
@@ -44,7 +45,7 @@ implementation
 { TImageBMPExporter }
 {$IFDEF MSWINDOWS}
 {$IFDEF DCC}
-class function TImageBMPExporter.CreateBitmapDelphiWindows(AViewer: TViewer): TBitmap;
+class procedure TImageBMPExporter.CreateBitmapDelphiWindows(AViewer: TViewer; const _AFileName: string);
 type
   TRGBTriple = packed record
     B, G, R: byte;
@@ -55,18 +56,18 @@ var
   x, y: Integer;
   AScanLine: pRGBTripleArray;
   AColor: TByteColor;
+  ABitmap: TBitmap;
 begin
-  Result := TBitmap.Create;
+  ABitmap := TBitmap.Create;
   try
-    Result.Height := AViewer.Height;
-    Result.Width := AViewer.Width;
-    Result.PixelFormat := pf24Bit;
+    ABitmap.PixelFormat := pf24Bit;
+    ABitmap.SetSize(AViewer.Width, AViewer.Height);
 
-    for y := AViewer.Height - 1 downto  0 do
+    for y := ABitmap.Height - 1 downto  0 do
     begin
-      AScanLine := Result.ScanLine[AViewer.Height - 1 - y];
+      AScanLine := ABitmap.ScanLine[ABitmap.Height - 1 - y];
 
-      for x := 0 to AViewer.Width - 1 do
+      for x := 0 to ABitmap.Width - 1 do
       begin
         AColor.SetFromVector3f(AViewer.GetPixel(x, y));
 
@@ -75,81 +76,54 @@ begin
         AScanLine[x].B := AColor.B;
       end;
     end;
-  except
-    Result.Free;
-    raise;
+    ABitmap.SaveToFile(_AFileName);
+  finally
+    ABitmap.Free;
   end;
 end;
 {$ENDIF}  
 {$ENDIF}  
 
 class procedure TImageBMPExporter.ExportToFile(AViewer: TViewer; const _AFileName: string);
-var
-  ABitmap: TBitmap;
+{$IFDEF DCC}
+{$ENDIF}
 begin
 {$IFDEF MSWINDOWS}
-{$IFDEF DCC}
-  ABitmap := TImageBMPExporter.CreateBitmapDelphiWindows(AViewer);
-{$ENDIF}  
+  {$IFDEF DCC}
+    TImageBMPExporter.CreateBitmapDelphiWindows(AViewer, _AFileName);
+  {$ENDIF}
 {$ENDIF}  
 {$IFDEF FPC}   
-  ABitmap := TImageBMPExporter.CreateBitmapFPC(AViewer);
+  TImageBMPExporter.CreateBitmapFPC(AViewer, _AFileName);
 {$ENDIF}  
-  try
-    ABitmap.SaveToFile(_AFileName);
-  finally
-    ABitmap.Free;
-  end;
 end;
 
 {$IFDEF FPC}   
-class function TImageBMPExporter.CreateBitmapFPC(AViewer: TViewer): TBitmap;
+class procedure TImageBMPExporter.CreateBitmapFPC(AViewer: TViewer; const _AFileName: string);
 var
-  IntfImage: TLazIntfImage;
-  ScanLineImage: TLazIntfImage;
-  ImgFormatDescription: TRawImageDescription;   
-  AScanLine: Pointer; 
+  AImage : TFPMemoryImage;
   x, y: Integer;
-  AColor: TByteColor;  
+  clr: TFPColor;  
+  AColor: TWordColor;
 begin
-  Result := TBitmap.Create;
+  AImage := TFPMemoryImage.Create(AViewer.Width, AViewer.Height);  
   try
-    ScanLineImage := TLazIntfImage.Create(0,0);
-    try
-      ImgFormatDescription.Init_BPP32_B8G8R8_BIO_TTB(AViewer.Width, AViewer.Height);
-      ScanLineImage.DataDescription:=ImgFormatDescription;  
-
-      for y := AViewer.Height - 1 downto  0 do
+    AImage.UsePalette:= False;    
+    for y := 0 to AImage.Height - 1 do
+      for x := 0 to AImage.Width - 1 do
       begin
-        AScanLine := ScanLineImage.GetDataLineStart(y);
-        //AScanLine := Result.ScanLine[AViewer.Height - 1 - y];
-        for x := 0 to AViewer.Width - 1 do
-        begin
-          AColor.SetFromVector3f(AViewer.GetPixel(x, y));
+        AColor.SetFromVector3f(AViewer.GetPixel(x, y));
 
-          PByte(AScanLine)[x * 4] := AColor.R;
-          PByte(AScanLine)[x * 4 + 1] := AColor.G;
-          PByte(AScanLine)[x * 4 + 2] := AColor.B;
-          PByte(AScanLine)[x * 4 + 3] := 255;
-        end;
-      end;
+        clr.Red := AColor.R;
+        clr.Green := AColor.G;
+        clr.Blue := AColor.B;    
 
-      Result.Height := ScanLineImage.Height;
-      Result.Width := ScanLineImage.Width;
-
-      IntfImage := Result.CreateIntfImage; 
-      try
-        IntfImage.CopyPixels(ScanLineImage);  
-      finally
-        IntfImage.Free;  
-      end;
-    finally
-      ScanLineImage.Free; 
-    end;
-  except
-    Result.Free;
-    raise;
-  end;  
+        AImage.Colors[x, (AImage.Height -1 - y)] := clr;
+       end;
+    AImage.SaveToFile(_AFileName); 
+  finally
+    AImage.Free;
+  end;
 end;
 {$ENDIF}  
 

@@ -34,7 +34,7 @@ begin
       ////////////////////////////////////////////////////////////////////////////
 
       sTime := MillisecondsBetween(AStart, AEnd).ToString;
-      TImagePPMExporter.ExportToFile(AViewer, 'render.ppm');
+      //TImagePPMExporter.ExportToFile(AViewer, 'render.ppm');
       TImageBMPExporter.ExportToFile(AViewer, 'render.bmp');
     finally
       AViewer.Free;

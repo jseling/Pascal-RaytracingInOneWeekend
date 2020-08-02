@@ -72,6 +72,16 @@ type
     procedure SetFromVector3f(const _AVectorColor: TVector3f);
   end;
 
+  TWordColor = record
+  public
+    R: Word;
+    G: Word;
+    B: Word;
+
+    //expect a vector with RGB values within 0..1 interval.
+    procedure SetFromVector3f(const _AVectorColor: TVector3f);
+  end;  
+
   TArrayVector3f = array of TVector3f;
   TArraySingle = array of Single;
 
@@ -235,6 +245,29 @@ begin
   Y := _AY;
   Z := _AZ;
   W := _AW;
+end;
+
+procedure TWordColor.SetFromVector3f(const _AVectorColor: TVector3f);
+var
+  AR, AG, AB: Integer;
+
+  function FixRange(_AValue: Integer): Word;
+  begin
+    Result := _AValue;
+    if _AValue > 65535 then
+      Result := 65535;
+
+    if _AValue < 0 then
+      Result := 0;
+  end;
+begin
+  AR := Trunc(_AVectorColor.x * 65535);
+  AG := Trunc(_AVectorColor.y * 65535);
+  AB := Trunc(_AVectorColor.Z * 65535);
+
+  R := FixRange(AR);
+  G := FixRange(AG);
+  B := FixRange(AB);  
 end;
 
 end.
