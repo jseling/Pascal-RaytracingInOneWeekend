@@ -5,6 +5,13 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 ![](renderLinux14251.png)
 
 **TODO:**
+- [x] JSON scene loader in Windows
+- [x] JSON scene loader in Linux
+- [x] PPM image exporter in Windows
+- [x] PPM image exporter in Linux
+- [x] BMP image exporter in Windows
+- [x] BMP image exporter in Linux
+
 - [x] The vec3 Class
 - [x] Rays, a Simple Camera, and Background
 - [x] Adding a Sphere
@@ -12,8 +19,10 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 - [x] Antialiasing
 - [x] Diffuse Materials
 - [x] Metal
-- [x] Fix bmp exporter in Linux
 - [ ] Dielectrics
 - [ ] Positionable Camera
 - [ ] Defocus Blur
 - [ ] Where Next?
+
+- [ ] Clean the code
+- [ ] Nothing more to do, project concluded.
