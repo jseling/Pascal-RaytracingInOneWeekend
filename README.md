@@ -26,5 +26,8 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 - [ ] Defocus Blur
 - [ ] Where Next?
 
+**Experimental TODOS:**
+- [ ] Deterministic ray scattering. Expected: Less rays do the diffusion looks like more the reflection, but without noise.
+
 **Project TODOs:**
 - [ ] Nothing more to do, project concluded.
