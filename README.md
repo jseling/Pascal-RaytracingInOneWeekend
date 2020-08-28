@@ -27,7 +27,7 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 - [ ] Where Next?
 
 **Experimental TODOS:**
-- [ ] Deterministic ray scattering. Expected: Less rays do the diffusion looks like more the reflection, but without noise.
+- [ ] Deterministic ray scattering. Expected: Less rays do the diffusion looks like more the reflection, but without noise. Four rays per pixel to antialiasing effect. Each ray is divided in N sample rays in a grid way scattering. How will the light result behaviour be like?
 
 **Project TODOs:**
 - [ ] Nothing more to do, project concluded.
