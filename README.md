@@ -21,9 +21,9 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 - [x] Antialiasing
 - [x] Diffuse Materials
 - [x] Metal
-- [ ] Dielectrics
-- [ ] Positionable Camera
-- [ ] Defocus Blur
+- [x] Dielectrics
+- [x] Positionable Camera
+- [x] Defocus Blur
 - [ ] Where Next?
 
 **Experimental TODOS:**
