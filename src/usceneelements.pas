@@ -6,7 +6,8 @@ uses
   uVectorTypes,
   SysUtils,
   uRayTracerTypes,
-  uRandomUtils;
+  uRandomUtils,
+  Math;
 
 type
 
@@ -30,6 +31,12 @@ type
     function Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f; out _ARayScattered: TRay): Boolean; override;
   end;
 
+  TDieletricMaterial = class(TBaseMaterial)
+  public
+    RefractionIndex: Single;
+    function Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f; out _ARayScattered: TRay): Boolean; override;
+  end;  
+
   TMeshObject = class
   public
     Center: TVector3f;
@@ -50,19 +57,20 @@ type
   end;
 
   TCamera = class
+  private
+    FLens_Radius: Single;
+    w, u, v: TVector3f;
   public
     Position: TVector3f;
     LowerLeftCorner: TVector3f;
-    FOV: Single;
     Horizontal: TVector3f;
     Vertical: TVector3f;
-    Height,
-    Width: Integer;
-//    BackgroundColor: TVector3f;
+     Height,
+     Width: Integer;
+//    BackgroundColor: TVector3f;   
 
-    constructor Create();
-    function GetRay(u, v: Single): TRay;
-
+    constructor Create(lookfrom, lookat, vup: Tvector3f; vfov, aspect_ratio, aperture, focus_dist: single);
+    function GetRay(s, t: Single): TRay;
   end;
 
 implementation
@@ -129,42 +137,49 @@ end;
 
 procedure TSphere.SetRadius(_AValue: Single);
 begin
-  if (_AValue <= 0) then
-    raise Exception.Create('TSphere: Invalid radius value setting.');
-
   FRadius := _AValue;
   FInvRadius := 1 / FRadius;
 end;
 
 { TCamera }
 
-constructor TCamera.Create;
+constructor TCamera.Create(lookfrom, lookat, vup: Tvector3f; vfov, aspect_ratio, aperture, focus_dist: single);
 var
-  aspect_ratio: Single;
   viewport_height: Single;
   viewport_width: Single;
   f: TVector3f;
+  theta: Single;
+  h: Single;
 begin
-  aspect_ratio := 4 / 3;
-  viewport_height := 2;
-  viewport_width := viewport_height * aspect_ratio;
+  theta := DegToRad(vfov);
+  h := Tan(theta/2);
+  viewport_height := 2 * h;
+  viewport_width := aspect_ratio * viewport_height;
 
-  FOV := 1;
-  f.Create(0, 0, FOV);
+  w := lookfrom.Subtract(lookat).Normalize;
+  u := vup.CrossProduct(w).Normalize;
+  v := w.CrossProduct(u);
 
-  Position.Create(0,0,0);
-  Horizontal.Create(viewport_width,0,0);
-  Vertical.Create(0,viewport_height,0);
-  LowerLeftCorner := Position.Subtract(Horizontal.Scale(1/2)).Subtract( Vertical.scale(1/2)).Subtract(f);
+  Position := lookfrom;
+  Horizontal := u.Scale(viewport_width).Scale(focus_dist);
+  Vertical := v.Scale(viewport_height).Scale(focus_dist);
+  LowerLeftCorner := Position.Subtract(Horizontal.Scale(0.5)).Subtract(Vertical.Scale(0.5)).Subtract(w.Scale(focus_dist));
+
+  FLens_Radius := aperture / 2;
 end;
 
-function TCamera.GetRay(u, v: Single): TRay;
+function TCamera.GetRay(s, t: Single): TRay;
 var
   AOrig,
-  ADir: TVector3f;
+  ADir,
+  rd,
+  offset: TVector3f;
 begin
-  AOrig := Self.Position;
-  ADir := LowerLeftCorner.Add(Horizontal.Scale(u)).Add(Vertical.Scale(v)).Subtract(AOrig);
+  rd := TRandomUtils.RandomInUnitDisk().Scale(FLens_Radius);
+  offset := u.Scale(rd.X).Add(v.Scale(rd.Y)); 
+
+  AOrig := Self.Position.Add(offset);
+  ADir := LowerLeftCorner.Add(Horizontal.Scale(s)).Add(Vertical.Scale(t)).Subtract(AOrig);//.Subtract(offset);
   //ADir := Adir.Normalize();
 
   Result.Create(AOrig, ADir);
@@ -197,6 +212,50 @@ begin
   _AColorAttenuation := Albedo;
 
   Result := _ARayScattered.Dir.DotProduct(_AHit.Normal) > 0;
+end;
+
+function TDieletricMaterial.Scatter(_ARayIn: TRay; _AHit: THit; out _AColorAttenuation: TVector3f; out _ARayScattered: TRay): Boolean;
+var
+  etai_over_etat: Single;
+  unit_direction: TVector3f;
+  refracted: TVector3f;  
+  cos_theta: Single;
+  sin_theta: Single;
+  reflected: TVector3f;
+  reflect_prob: Single;
+
+  function schlick(cosine, ref_idx: single): single;
+  var
+    r0: Single;
+  begin
+    r0 := (1 - ref_idx) / (1 + ref_idx);
+    r0 := r0 * r0;
+    result := r0 + (1 - r0) * Power((1 - cosine), 5);
+  end;
+begin
+  _AColorAttenuation.Create(1,1,1);
+
+  if _AHit.FrontFace then
+    etai_over_etat := 1 / RefractionIndex
+  else
+    etai_over_etat := RefractionIndex;
+
+  unit_direction := _ARayIn.Dir.Normalize;
+  cos_theta := Min(unit_direction.Scale(-1).DotProduct(_AHit.Normal), 1);
+  sin_theta := Sqrt(1 - cos_theta * cos_theta);
+
+  if (etai_over_etat * sin_theta > 1) or
+     (TRandomUtils.RandomSingle() < schlick(cos_theta, etai_over_etat)) then
+  begin
+    reflected := unit_direction.Reflect(_AHit.Normal);
+    _ARayScattered.Create(_AHit.Point, reflected);
+    result := True;
+    exit;
+  end;
+
+  refracted := unit_direction.Refract(_AHit.Normal, etai_over_etat);
+  _ARayScattered.Create(_AHit.Point, refracted);
+  result := True;
 end;
 
 end.

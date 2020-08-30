@@ -16,7 +16,6 @@ uses
 type
   TRaytracer = class
   private
-    //class procedure ShowProgress(Position,Max:integer);
     class function CastRay(_ARay: TRay; _AScene: TScene; _ADepth: integer): TVector3f;
     class function SceneIntersect(_AScene: TScene; _ARay: TRay; _At_min, _At_max: single; out _AHit: THit): boolean;
     class function ray_color(r: TRay) : TVector3f;
@@ -30,23 +29,6 @@ uses
   Math;
 
 { TRaytracer }
-{
-class procedure TRaytracer.ShowProgress(Position,Max:integer);
-var
-  i,j:integer;
-  s:string;
-const
-  BarWidth=28; //must be less than 79
-begin
-  s := '[';
-
-  j := Position * BarWidth div Max;
-  for i := 1 to BarWidth do
-    if i <= j then s := s + '#' else s := s + '-';
-
-  s := s + ']';
-  Write(#13 + s);
-end;  }
 
 class function TRaytracer.ray_color(r: TRay) : TVector3f;
 var
@@ -146,7 +128,7 @@ begin
 
       _AViewer.SetPixel(i, j, AColor);
 
-      write(#13'Progress: '+ formatfloat('0.00', ((_AViewer.Height-j)*_AViewer.Width + i) * 100 / (_AViewer.Height*_AViewer.Width)) + ' %.')
+      write(#13'Progress: '+ formatfloat('0.00', ((_AViewer.Height-j)*_AViewer.Width + i) * 100 / (_AViewer.Height*_AViewer.Width)) + ' %')
 
       //ShowProgress(i, _AViewer.Height*_AViewer.Width);
     end;

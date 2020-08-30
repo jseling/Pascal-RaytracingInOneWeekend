@@ -15,6 +15,7 @@ type
     class function RandomInUnitSphere(): TVector3f;
     class function RandomUnitVector(): TVector3f;
     class function RandomInHemisphere(_ANormal: TVector3f): TVector3f;
+    class function RandomInUnitDisk(): TVector3f;
   end;
 
 implementation
@@ -39,13 +40,6 @@ end;
 
 class function TRandomUtils.RandomInUnitSphere: TVector3f;
 begin
-//  while (true) do
-//  begin
-//    Result := RandomVector(-1, 1);
-//    if (Result.MagnitudeSquared() >= 1) then
-//      Continue;
-//    Break;
-//  end;
   repeat
     Result := RandomVector(-1, 1)
   until (Result.MagnitudeSquared() < 1);
@@ -76,6 +70,13 @@ end;
 class function TRandomUtils.RandomVector: TVector3f;
 begin
   Result.Create(RandomSingle(), RandomSingle(), RandomSingle());
+end;
+
+class function TRandomUtils.RandomInUnitDisk: TVector3f;
+begin
+  repeat
+    result.Create(RandomSingle(-1, 1), RandomSingle(-1, 1), 0);
+  until result.MagnitudeSquared < 1;
 end;
 
 initialization

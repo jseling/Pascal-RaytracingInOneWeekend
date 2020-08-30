@@ -104,22 +104,33 @@ begin
   if sType = 'diffuse' then
   begin
     result := TLambertianMaterial.Create;
+
+    AData := _AJSONObject.GetValue<TJSONArray>('albedo');
+    x := AData.Items[0].GetValue<single>;
+    y := AData.Items[1].GetValue<single>;
+    z := AData.Items[2].GetValue<single>;
+    result.Albedo.Create(x, y, z);
   end
   else if sType = 'metal' then
   begin
     result := TMetalMaterial.Create;
     TMetalMaterial(result).Fuzz := _AJSONObject.GetValue<single>('fuzz');
+
+    AData := _AJSONObject.GetValue<TJSONArray>('albedo');
+    x := AData.Items[0].GetValue<single>;
+    y := AData.Items[1].GetValue<single>;
+    z := AData.Items[2].GetValue<single>;
+    result.Albedo.Create(x, y, z);
   end
+  else if sType = 'dieletric' then
+  begin
+    result := TDieletricMaterial.Create;
+    TDieletricMaterial(result).RefractionIndex := _AJSONObject.GetValue<single>('refIdx');
+  end  
   else
     raise Exception.Create('Material type not supported: ''' + sType + '''');
 
   result.Name := sName;
-
-  AData := _AJSONObject.GetValue<TJSONArray>('albedo');
-  x := AData.Items[0].GetValue<single>;
-  y := AData.Items[1].GetValue<single>;
-  z := AData.Items[2].GetValue<single>;
-  result.Albedo.Create(x, y, z);
 end;
 
 class function TSceneLoader.GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;
@@ -160,29 +171,49 @@ class function TSceneLoader.GetCameraFromJSON(_AJSONObject: TJSONObject): TCamer
 var
   AData: TJSONArray;
   x,y,z: Single;
+  vFov, ap, fd: Single;
+  width,
+  height: integer;
+  p, t, u: TVector3f;
 begin
-  result := TCamera.Create();
+  vFov := _AJSONObject.GetValue<Single>('vfov');
+
+  x := _AJSONObject.GetValue<Single>('width');
+  width := trunc(x);
+
+  x := _AJSONObject.GetValue<Single>('height');
+  height := trunc(x);
 
   AData := _AJSONObject.GetValue<TJSONArray>('position');
   x := AData.Items[0].GetValue<single>;
   y := AData.Items[1].GetValue<single>;
   z := AData.Items[2].GetValue<single>;
-  result.Position.Create(x, y, z);
+  p.Create(x,y,z);
+
+  AData := _AJSONObject.GetValue<TJSONArray>('target');
+  x := AData.Items[0].GetValue<single>;
+  y := AData.Items[1].GetValue<single>;
+  z := AData.Items[2].GetValue<single>;
+  t.Create(x,y,z);
+
+  AData := _AJSONObject.GetValue<TJSONArray>('up');
+  x := AData.Items[0].GetValue<single>;
+  y := AData.Items[1].GetValue<single>;
+  z := AData.Items[2].GetValue<single>;
+  u.Create(x,y,z);  
+
+  ap := _AJSONObject.GetValue<Single>('aperture');
+  fd := p.Subtract(t).Magnitude;
+
+  result := TCamera.Create(p, t, u, vFov, width/height, ap, fd);
+  result.Height := height;
+  result.Width := width;  
 
 //  AData := _AJSONObject.GetValue<TJSONArray>('direction');
 //  x := AData.Items[0].GetValue<single>;
 //  y := AData.Items[1].GetValue<single>;
 //  z := AData.Items[2].GetValue<single>;
 //  result.Direction.Create(x, y, z);
-
-  x := _AJSONObject.GetValue<Single>('fov');
-  result.FOV := x;
-
-  x := _AJSONObject.GetValue<Single>('width');
-  result.Width := trunc(x);
-
-  x := _AJSONObject.GetValue<Single>('height');
-  result.Height := trunc(x);
 
 //  AData := _AJSONObject.GetValue<TJSONArray>('backgroundColor');
 //  x := AData.Items[0].GetValue<single>;

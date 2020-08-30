@@ -31,12 +31,13 @@ type
     function Scale(_AFactor: Single): TVector3f; overload; inline;
     function Scale(_AFactor: TVector3f): TVector3f; overload; inline;
     function DotProduct(_AVector: TVector3f): Single; inline;
+    function CrossProduct(_AVector: TVector3f): TVector3f; inline;
     function Magnitude(): Single; inline;
     function MagnitudeSquared(): Single; inline;
     function Normalize(): TVector3f; inline;
     function Reflect(_ANormal: TVector3f): TVector3f; inline;
-    function Refract(_AN: TVector3f; eta_t: Single; eta_i: Single = 1): TVector3f; inline;
-
+//    function Refract(_AN: TVector3f; eta_t: Single; eta_i: Single = 1): TVector3f; inline;
+    function Refract(_AN: TVector3f; eta: Single): TVector3f; inline;
         function PrettyString(): string;
   end;
 
@@ -193,28 +194,40 @@ begin
   Result := Self.Subtract(ANScale2.Scale(AIDotN));
 end;
 
-function TVector3f.Refract(_AN: TVector3f; eta_t: Single; eta_i: Single = 1): TVector3f;
+function TVector3f.Refract(_AN: TVector3f; eta: Single): TVector3f;
 var
-  cosi: Single;
-  eta: Single;
-  k: Single;
+  cos_theta: Single;
+  r_out_perp: TVector3f;
+  r_out_parallel: TVector3f;
 begin
-  cosi := Max(-1, Min(1, Self.DotProduct(_AN))) * (-1);
-
-  if (cosi < 0) then
-  begin
-    Result := Self.Refract(_AN.Scale(-1), eta_i, eta_t);
-    exit;
-  end;
-
-  eta := eta_i / eta_t;
-  k := 1 - eta * eta * (1 - cosi * cosi);
-
-  if (k < 0) then
-    Result.Create(1, 0, 0)
-  else
-    Result := Self.Scale(eta).Add(_AN.Scale(eta * cosi - sqrt(k)));
+  cos_theta := Self.Scale(-1).DotProduct(_AN);
+  r_out_perp  :=  Self.Add(_AN.Scale(cos_theta)).Scale(eta);
+  r_out_parallel :=  _AN.Scale(- Sqrt(Abs(1 - r_out_perp.MagnitudeSquared)));
+  result := r_out_perp.Add(r_out_parallel);
 end;
+
+//function TVector3f.Refract(_AN: TVector3f; eta_t: Single; eta_i: Single = 1): TVector3f;
+//var
+//  cosi: Single;
+//  eta: Single;
+//  k: Single;
+//begin
+//  cosi := Max(-1, Min(1, Self.DotProduct(_AN))) * (-1);
+//
+//  if (cosi < 0) then
+//  begin
+//    Result := Self.Refract(_AN.Scale(-1), eta_i, eta_t);
+//    exit;
+//  end;
+//
+//  eta := eta_i / eta_t;
+//  k := 1 - eta * eta * (1 - cosi * cosi);
+//
+//  if (k < 0) then
+//    Result.Create(1, 0, 0)
+//  else
+//    Result := Self.Scale(eta).Add(_AN.Scale(eta * cosi - sqrt(k)));
+//end;
 
 function TVector3f.Scale(_AFactor: Single): TVector3f;
 begin
@@ -268,6 +281,13 @@ begin
   R := FixRange(AR);
   G := FixRange(AG);
   B := FixRange(AB);  
+end;
+
+function TVector3f.CrossProduct(_AVector: TVector3f): TVector3f;
+begin
+  Result.Create( Y * _AVector.Z - Z * _AVector.Y,
+                 Z * _AVector.X - X * _AVector.Z,
+                 X * _AVector.Y - Y * _AVector.X);  
 end;
 
 end.

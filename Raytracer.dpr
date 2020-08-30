@@ -16,7 +16,8 @@ uses
   usceneelementlists in 'src\usceneelementlists.pas',
   uimagebmpexporter in 'src\uimagebmpexporter.pas',
   uRandomUtils in 'src\uRandomUtils.pas',
-  uRaytracerTypes in 'src\uRaytracerTypes.pas';
+  uRaytracerTypes in 'src\uRaytracerTypes.pas',
+  usceneloaderbookcover in 'src\usceneloaderbookcover.pas';
 
 var
   AViewer: TViewer;
@@ -38,7 +39,8 @@ begin
   //1 - Memory leaks
 
   try
-    AScene := TSceneLoader.Build('scene.json');
+    //AScene := TSceneLoader.Build('scene.json');
+    AScene := TBookCoverSceneLoader.Build();
     try
       AViewer := TViewer.Create(AScene.Camera);
       try
@@ -66,6 +68,6 @@ begin
   end;
 
 
-  readln;
+  //readln;
 end.
 

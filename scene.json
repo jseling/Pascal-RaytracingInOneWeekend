@@ -1,58 +1,60 @@
 {
 	"materials": [
 		{
-			"id": "dif_red",
-			"type": "diffuse",
-			"albedo": [0.7, 0.3, 0.3]			
+			"id": "glass",
+			"type": "dieletric",
+			"refIdx": 1.5			
 		},
 		{
-			"id": "dif_yellow",
+			"id": "ground",
 			"type": "diffuse",
 			"albedo": [0.8, 0.8, 0.0]	
 		},
 		{
-			"id": "met_yellow",
+			"id": "right",
 			"type": "metal",
-			"fuzz": 1,
+			"fuzz": 0,
 			"albedo": [0.8,0.6,0.2]	
 		},
 		{
-			"id": "met_lightgrey",
-			"type": "metal",
-			"fuzz": 0.3,			
-			"albedo": [0.8,0.8,0.8]	
+			"id": "center",
+			"type": "diffuse",
+			"albedo": [0.1,0.2,0.5]	
 		}
 	],
 	"objects":[
 		{
 			"object": "sphere",
-			"position": [0, 0, -1],
-			"radius": 0.5,
-			"materialId": "dif_red"
-		},
-		{
-			"object": "sphere",
 			"position": [0, -100.5, -1],
 			"radius": 100,
-			"materialId": "dif_yellow"
+			"materialId": "ground"
+		},		
+		{
+			"object": "sphere",
+			"position": [0, 0, -1],
+			"radius": 0.5,
+			"materialId": "center"
 		},
 		{
 			"object": "sphere",
 			"position": [1,0,-1],
 			"radius": 0.5,
-			"materialId": "met_yellow"
+			"materialId": "right"
 		},		
 		{
 			"object": "sphere",
 			"position": [-1,0,-1],
-			"radius": 0.5,
-			"materialId": "met_lightgrey"
+			"radius": -0.5,
+			"materialId": "glass"
 		}			
 	],
 	"camera": {
-			"position": [0, 0, 0],
-			"direction": [0, 0, -1],
-			"fov": 1.57,
+			"position": [3, 3, 2],
+			"target": [0, 0, -1],
+			"up": [0, 1, 0],
+			"vfov": 20,
+			"aperture": 2,
+			"dist_to_focus": -1,
 			"width": 400,
 			"height": 300,
 			"backgroundColor": [0.2, 0.7, 0.8]
