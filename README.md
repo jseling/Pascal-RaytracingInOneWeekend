@@ -4,7 +4,7 @@ This is a fairly straightforward implementation of [Peter Shirley's "Ray Tracing
 
 ![](render_capa.jpg)
 
-Book cover rendered with 3000 x 2000 pixels, 1000 samples per pixel and 500 of max ray depth. Took approximately 41 hours to render on Delphi-Windows.
+Book cover rendered with 3000 x 2000 pixels, 1000 samples per pixel and 500 of max ray depth. Took approximately 41 hours to render on Delphi-Windows build.
 
 **Technical TODOs:**
 - [x] JSON scene loader in Windows
