@@ -12,8 +12,8 @@ uses
   uSceneElementLists,
   uBaseList,
   uRaytracerTypes,
-  uImageBMPExporter;
-
+  uImageBMPExporter,
+  usceneloaderbookcover;
 
 var
   AViewer: TViewer;
@@ -21,7 +21,8 @@ var
   AStart, AEnd: TTime;
   sTime: string;
 begin
-  AScene := TSceneLoader.Build('scene.json');
+  //AScene := TSceneLoader.Build('scene.json');
+  AScene := TBookCoverSceneLoader.Build();
   try
     AViewer := TViewer.Create(AScene.Camera);
     try

@@ -208,18 +208,6 @@ begin
   result := TCamera.Create(p, t, u, vFov, width/height, ap, fd);
   result.Height := height;
   result.Width := width;  
-
-//  AData := _AJSONObject.GetValue<TJSONArray>('direction');
-//  x := AData.Items[0].GetValue<single>;
-//  y := AData.Items[1].GetValue<single>;
-//  z := AData.Items[2].GetValue<single>;
-//  result.Direction.Create(x, y, z);
-
-//  AData := _AJSONObject.GetValue<TJSONArray>('backgroundColor');
-//  x := AData.Items[0].GetValue<single>;
-//  y := AData.Items[1].GetValue<single>;
-//  z := AData.Items[2].GetValue<single>;
-//  result.BackgroundColor.Create(x, y, z);
 end;
 
 end.

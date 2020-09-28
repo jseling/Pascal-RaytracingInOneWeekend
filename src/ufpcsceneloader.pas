@@ -5,11 +5,12 @@ interface
 uses
   Classes,
   SysUtils,
+  uSceneElements,  
   fpjson,
   jsonparser,
   jsonscanner,
   uscene,
-  uSceneElements,
+  uVectorTypes,
   uRayTracerTypes;
 
 type
@@ -115,20 +116,33 @@ begin
   if sType = 'diffuse' then
   begin
     result := TLambertianMaterial.Create;
+
+    AData := _AJSONObject.Find('albedo');
+    x := AData.Items[0].AsFloat;
+    y := AData.Items[1].AsFloat;
+    z := AData.Items[2].AsFloat;
+    result.Albedo.Create(x, y, z);    
   end
   else if sType = 'metal' then
   begin
     result := TMetalMaterial.Create;
     TMetalMaterial(result).Fuzz := _AJSONObject.Find('fuzz').AsFloat;
-  end;
 
-  result.Name := sName;  
+    AData := _AJSONObject.Find('albedo');
+    x := AData.Items[0].AsFloat;
+    y := AData.Items[1].AsFloat;
+    z := AData.Items[2].AsFloat;
+    result.Albedo.Create(x, y, z);
+  end
+  else if sType = 'dieletric' then
+  begin
+    result := TDieletricMaterial.Create;
+    TDieletricMaterial(result).RefractionIndex := _AJSONObject.Find('refIdx').AsFloat;
+  end  
+  else
+    raise Exception.Create('Material type not supported: ''' + sType + '''');
 
-  AData := _AJSONObject.Find('albedo');
-  x := AData.Items[0].AsFloat;
-  y := AData.Items[1].AsFloat;
-  z := AData.Items[2].AsFloat;
-  result.Albedo.Create(x, y, z);
+  result.Name := sName;    
 end;
 
 class function TSceneLoader.GetObjectFromJSON(_AJSONObject: TJSONObject): TSphere;
@@ -169,35 +183,43 @@ class function TSceneLoader.GetCameraFromJSON(_AJSONObject: TJSONObject): TCamer
 var
   AData: TJSONData;
   x,y,z: Single;
+  vFov, ap, fd: Single;
+  width,
+  height: integer;
+  p, t, u: TVector3f;
 begin
-  result := TCamera.Create();
+  vFov := _AJSONObject.Find('vfov').AsFloat;
+
+  x := _AJSONObject.Find('width').AsFloat;
+  width := trunc(x);
+
+  x := _AJSONObject.Find('height').AsFloat;
+  height := trunc(x);
 
   AData := _AJSONObject.Find('position');
   x := AData.Items[0].AsFloat;
   y := AData.Items[1].AsFloat;
   z := AData.Items[2].AsFloat;
-  result.Position.Create(x, y, z);
+  p.Create(x, y, z);
 
-  // AData := _AJSONObject.Find('direction');
-  // x := AData.Items[0].AsFloat;
-  // y := AData.Items[1].AsFloat;
-  // z := AData.Items[2].AsFloat;
-  // result.Direction.Create(x, y, z);
+  AData := _AJSONObject.Find('target');
+  x := AData.Items[0].AsFloat;
+  y := AData.Items[1].AsFloat;
+  z := AData.Items[2].AsFloat;
+  t.Create(x, y, z);
 
-  x := _AJSONObject.Find('fov').AsFloat;
-  result.FOV := x;
+  AData := _AJSONObject.Find('up');
+  x := AData.Items[0].AsFloat;
+  y := AData.Items[1].AsFloat;
+  z := AData.Items[2].AsFloat;
+  u.Create(x, y, z);
 
-  x := _AJSONObject.Find('width').AsFloat;
-  result.Width := trunc(x);
+  ap := _AJSONObject.Find('aperture').AsFloat;
+  fd := p.Subtract(t).Magnitude;
 
-  x := _AJSONObject.Find('height').AsFloat;
-  result.Height := trunc(x);
-
-  // AData := _AJSONObject.Find('backgroundColor');
-  // x := AData.Items[0].AsFloat;
-  // y := AData.Items[1].AsFloat;
-  // z := AData.Items[2].AsFloat;
-  // result.BackgroundColor.Create(x, y, z);
+  result := TCamera.Create(p, t, u, vFov, width/height, ap, fd);
+  result.Height := height;
+  result.Width := width;  
 end;
 
 end.

@@ -7,7 +7,7 @@ uses
   SysUtils,
   uSceneElements,
   uScene,
-  System.Generics.Collections,
+  //System.Generics.Collections,
   uVectorTypes,
   uRayTracerTypes,
   uRandomUtils;
